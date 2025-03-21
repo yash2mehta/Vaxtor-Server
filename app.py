@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template
+from sqlalchemy import func
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
@@ -112,6 +113,27 @@ def retrieve_specific_record_va(record_id):
 
     return jsonify(result), 200  # Return JSON response
 
+# GET Request to retrieve a randomized record from the database for the vertical adjustment system
+@app.route('/va-record-random', methods=['GET'])
+def retrieve_random_record_va():
+    
+    # Fetch a random record
+    random_record = LicensePlateVA.query.order_by(func.random()).first()
+
+    # If no records exist in the database
+    if not random_record:
+        return jsonify({"error": "No records found in database"}), 404
+
+    result = {
+        "id": random_record.id,
+        "datetime": random_record.datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        "plate": random_record.plate,
+        "make": random_record.make,
+        "model": random_record.model,
+        "color": random_record.color
+    }
+
+    return jsonify(result), 200  # Return JSON response
 
 # GET Request to retrieve the latest record from the database for the vertical adjustment system
 @app.route('/va-record-latest', methods=['GET'])
