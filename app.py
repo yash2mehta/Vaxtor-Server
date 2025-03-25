@@ -162,7 +162,7 @@ def retrieve_latest_record_va():
 @app.route('/home/alpr')
 def display_latest_plate_alpr():
     # Get all entries from the database
-    plates = LicensePlateVaxtor.query.order_by(LicensePlateVaxtor.date.desc()).all()
+    plates = LicensePlateVaxtor.query.order_by(LicensePlateVaxtor.datetime.desc()).all()
 
     return render_template("index-vaxtor.html", latest=latest_plate_data, plates=plates)
 
