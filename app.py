@@ -41,13 +41,13 @@ def receive_alpr_data():
         confidence = data.get("confidence")
 
         # Convert date string to datetime
-        datetime = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
 
         # Store in database
         new_entry = LicensePlateVaxtor(
             plate=plate,
             image=image,
-            datetime = datetime,
+            datetime = timestamp,
             country=country,
             confidence=confidence
         )
