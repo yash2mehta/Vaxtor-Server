@@ -10,7 +10,7 @@ import os
 from db_instance import db
 
 # Import the models
-from models import LicensePlateVaxtor, LicensePlateVA
+from models import LicensePlateVaxtor, LicensePlateVA, LicensePlatePlateRecognizer
 
 # Import mock_data function
 from mock_data import insert_mock_data
@@ -29,7 +29,7 @@ db.init_app(app)
 
 # POST request to send mock data to server (simulating Vaxtor)
 ## TODO - Need to add field for MMC, according to Vaxtor's JSON reporting variable
-@app.route('/alpr', methods=['POST'])
+@app.route('/vaxtor-alpr', methods=['POST'])
 def receive_alpr_data():
     global latest_plate_data
     try:
@@ -41,13 +41,13 @@ def receive_alpr_data():
         confidence = data.get("confidence")
 
         # Convert date string to datetime
-        datetime = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
 
         # Store in database
         new_entry = LicensePlateVaxtor(
             plate=plate,
             image=image,
-            datetime = datetime,
+            datetime = timestamp,
             country=country,
             confidence=confidence
         )
@@ -68,6 +68,36 @@ def receive_alpr_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route('/platerecognizer-alpr', methods=['POST'])
+def receive_platerecognizer_data():
+    global latest_plate_data
+    try:
+        data = request.get_json()
+        plate = data.get("plate")
+        make = data.get("make")
+        model = data.get("model")
+
+        # Store in database
+        new_entry = LicensePlatePlateRecognizer(
+            plate=plate,
+            make=make,
+            model=model
+        )
+        db.session.add(new_entry)
+        db.session.commit()
+
+        # Update latest data for display
+        latest_plate_data = {
+            "plate": plate,
+            "make": make,
+            "model": model
+        }
+
+        return jsonify({"message": "License plate stored successfully", "plate": plate}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # GET Request to retrieve all mock data from database for vertical adjustment system
 @app.route('/va-all', methods=['GET'])
@@ -157,17 +187,46 @@ def retrieve_latest_record_va():
 
     return jsonify(result), 200  # Return JSON response
 
+# GET Request to retrieve the latest record from the database for plate recognizer
+@app.route('/platerecognizer-record-latest', methods=['GET'])
+def retrieve_latest_record_platerecognizer():
+    
+    # Fetch the latest record
+    latest_record = LicensePlatePlateRecognizer.query.order_by(LicensePlatePlateRecognizer.id.desc()).first()
+
+    # If no records exist in the database
+    if not latest_record:
+        return jsonify({"error": "No records found in database"}), 404
+
+    result = {
+        "id": latest_record.id,
+        "plate": latest_record.plate,
+        "make": latest_record.make,
+        "model": latest_record.model
+    }
+
+    return jsonify(result), 200  # Return JSON response
 
 # Homepage showing results from database (for ALPR - Vaxtor)
 @app.route('/home/alpr')
 def display_latest_plate_alpr():
     # Get all entries from the database
-    plates = LicensePlateVaxtor.query.order_by(LicensePlateVaxtor.date.desc()).all()
+    plates = LicensePlateVaxtor.query.order_by(LicensePlateVaxtor.datetime.desc()).all()
 
     return render_template("index-vaxtor.html", latest=latest_plate_data, plates=plates)
 
 
-# Homepage showing results from database (for VA - Vertical Adjustment System)
+
+# Homepage showing results from database (for ALPR - PlateRecognizer)
+@app.route('/home/platerecognizer')
+def display_latest_plate_platerecognizer():
+    # Get all entries from the database
+    plates = LicensePlatePlateRecognizer.query.all()
+
+    return render_template("index-platerecognizer.html", latest=latest_plate_data, plates=plates)
+
+
+# Homepage showing results from database (for VA - Vertical Adjustment System - from Vaxtor) - Testing 
 @app.route('/home/VA')
 def display_latest_plate_va():
     # Get all entries from the database
