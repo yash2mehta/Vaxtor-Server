@@ -119,4 +119,4 @@ The system provides two main endpoints:
 
 ---
 
-*This guide provides a comprehensive overview of the Vaxtor Server V1 system. For additional support or specific issues, please refer to the project documentation or contact the development team.*
+*This guide provides a comprehensive overview of the Vaxtor Server V1 system. For additional support or specific issues, please contact the development team.*
