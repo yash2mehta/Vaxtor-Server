@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Plate Recognizer Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Plate Recognizer Results</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Plate</th>
+            <th>Make</th>
+            <th>Model</th>
+        </tr>
+        {% for plate in plates %}
+        <tr>
+            <td>{{ plate.id }}</td>
+            <td>{{ plate.plate }}</td>
+            <td>{{ plate.make }}</td>
+            <td>{{ plate.model }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>
