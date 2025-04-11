@@ -1,6 +1,7 @@
 from flask import jsonify, render_template
 from app.models import LicensePlatePlateRecognizer
 from app.extensions import db
+import time
 
 def init_routes(app):
     @app.route('/home/platerecognizer')
@@ -10,6 +11,8 @@ def init_routes(app):
 
     @app.route('/platerecognizer-record-latest', methods=['GET'])
     def retrieve_latest_record_platerecognizer():
+        start_time = time.time()
+        
         latest_record = LicensePlatePlateRecognizer.query.order_by(LicensePlatePlateRecognizer.id.desc()).first()
 
         if not latest_record:
@@ -22,4 +25,5 @@ def init_routes(app):
             "model": latest_record.model
         }
 
+        print(f"Time taken for /platerecognizer-record-latest: {round((time.time() - start_time) * 1000, 2)}ms")
         return jsonify(result), 200 
