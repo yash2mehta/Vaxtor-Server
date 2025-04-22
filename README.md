@@ -1,8 +1,8 @@
-# Vaxtor Server V1 User Guide
+# Vaxtor Server User Guide
 
 ## 1. Overview
 
-Vaxtor Server V1 is a Flask-based web application that provides license plate recognition functionality. The system uses SQLite as its database and is designed to store and manage license plate information along with associated vehicle details (make and model). The application exposes RESTful APIs for plate recognition and data management.
+Vaxtor Server is a Flask-based web application that provides license plate recognition functionality. The system uses SQLite as its database and is designed to store and manage license plate information along with associated vehicle details (make and model). The application exposes RESTful APIs for plate recognition and data management.
 
 **Key Features:**
 - License plate recognition and storage
